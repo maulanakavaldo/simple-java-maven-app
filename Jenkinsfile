@@ -1,30 +1,18 @@
 pipeline {
     agent {
-        docker {
-            image 'maven:3.9.2'
-            args '-v /root/.m2:/root/.m2'
-        }
+        image 'maven:3.6.0-jdk-13'
+        label 'docker'
     }
     stages {
         stage('Build') {
             steps {
-                sh 'min -B -DskipTests clean package'
+                sh "mvn clean install"
             }
         }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-            post {
-                always {
-                    junit 'target/surefire-reports/*.xml'
-                }
-            }
-        }
-        stage('Deliver') {
-            steps {
-                sh './jenkins/scripts/deliver.sh'
-            }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
